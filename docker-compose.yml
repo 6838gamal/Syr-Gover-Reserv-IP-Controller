@@ -1,0 +1,27 @@
+services:
+  api:
+    build: .
+    image: syr-gover-reserv-ip-controller:latest
+    container_name: syr-gover-reserv-ip-controller
+    restart: unless-stopped
+    network_mode: host
+    pid: host
+    cap_add:
+      - NET_ADMIN
+    env_file:
+      - .env
+    volumes:
+      - ./config.yaml:/app/config.yaml:ro
+      - /etc/wireguard:/etc/wireguard:ro
+      - /var/lib/do-wg:/var/lib/do-wg
+      - /run/systemd:/run/systemd:ro
+      - /run/dbus:/run/dbus:ro
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
