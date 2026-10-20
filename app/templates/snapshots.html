@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Snapshots{% endblock %}
+{% block content %}
+<h1>Snapshots</h1>
+<button hx-post="/ui/snapshots" hx-target="#snapshot-result"
+        hx-swap="innerHTML">💾 إنشاء Snapshot الآن</button>
+<div id="snapshot-result"></div>
+
+<div id="snapshots-list"
+     hx-get="/partials/snapshots" hx-trigger="load, every 60s"
+     hx-swap="innerHTML">
+  <div class="muted">تحميل…</div>
+</div>
+{% endblock %}
