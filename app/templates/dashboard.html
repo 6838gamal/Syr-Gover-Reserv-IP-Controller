@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}الرئيسية{% endblock %}
+{% block content %}
+<h1>لوحة التحكم</h1>
+
+<div class="grid">
+  <div id="status-card" class="card"
+       hx-get="/partials/status" hx-trigger="load, every 30s"
+       hx-swap="innerHTML">
+    <div class="muted">تحميل الحالة…</div>
+  </div>
+
+  <div id="health-card" class="card"
+       hx-get="/partials/health" hx-trigger="load, every 60s"
+       hx-swap="innerHTML">
+    <div class="muted">تحميل الصحة…</div>
+  </div>
+
+  <div id="ip-card" class="card"
+       hx-get="/partials/ip" hx-trigger="load" hx-swap="innerHTML">
+    <div class="muted">تحميل IP…</div>
+  </div>
+</div>
+
+<div class="actions">
+  <button hx-post="/ui/ip/check" hx-target="#ip-card" hx-swap="innerHTML">
+    🔍 فحص IP الآن
+  </button>
+  <button hx-post="/ui/wireguard/restart" hx-target="#status-card"
+          hx-swap="innerHTML" hx-confirm="إعادة تشغيل WireGuard؟">
+    🔄 إعادة تشغيل WireGuard
+  </button>
+  <button hx-post="/ui/snapshots" hx-target="#snapshot-result"
+          hx-swap="innerHTML" hx-confirm="إنشاء snapshot الآن؟">
+    💾 إنشاء Snapshot
+  </button>
+</div>
+
+<div id="snapshot-result"></div>
+
+{% include "partials/manual_actions.html" %}
+{% endblock %}
