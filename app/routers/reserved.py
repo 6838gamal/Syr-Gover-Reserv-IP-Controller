@@ -29,6 +29,8 @@ def assign_reserved(
             action_status=result.get("action", {}).get("status", "unknown"),
             interface_updated=updated,
         )
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -43,5 +45,7 @@ def unassign_reserved(
         result = do.unassign_reserved_ip(ip)
         store.add("reserved.unassign", ip)
         return result
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
