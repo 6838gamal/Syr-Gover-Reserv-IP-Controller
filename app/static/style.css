@@ -1,0 +1,93 @@
+:root {
+  --bg: #0f172a;
+  --card: #1e293b;
+  --text: #e2e8f0;
+  --muted: #94a3b8;
+  --accent: #38bdf8;
+  --ok: #4ade80;
+  --bad: #f87171;
+  --warn: #fbbf24;
+  --border: #334155;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Tahoma, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+.topbar {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 0.75rem 1.25rem;
+  background: #0b1220;
+  border-bottom: 1px solid var(--border);
+}
+.brand { font-weight: 700; }
+nav a {
+  color: var(--accent);
+  margin-inline-start: 1rem;
+  text-decoration: none;
+}
+nav a:hover { text-decoration: underline; }
+main {
+  flex: 1; padding: 1.5rem; max-width: 1100px;
+  margin: 0 auto; width: 100%;
+}
+footer { text-align: center; padding: 1rem; color: var(--muted); }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1rem;
+}
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+.card h2 { margin-top: 0; font-size: 1rem; color: var(--accent); }
+.kv td { padding: 0.35rem 0.5rem; border-bottom: 1px dashed var(--border); }
+.kv td:first-child { color: var(--muted); width: 40%; }
+
+.actions {
+  margin: 1.25rem 0; display: flex; gap: 0.5rem; flex-wrap: wrap;
+}
+button {
+  background: #1d4ed8;
+  color: #fff; border: none; padding: 0.55rem 1rem;
+  border-radius: 8px; cursor: pointer; font: inherit;
+}
+button:hover { background: #2563eb; }
+
+table.data {
+  width: 100%; border-collapse: collapse; margin-top: 0.5rem;
+}
+table.data th, table.data td {
+  text-align: start; padding: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+table.data th { color: var(--muted); font-weight: 600; }
+
+.ok { color: var(--ok); }
+.bad { color: var(--bad); }
+.warn { color: var(--warn); }
+.muted { color: var(--muted); }
+.ip-big {
+  font-size: 1.6rem; font-weight: 700; letter-spacing: 0.03em;
+}
+code {
+  background: #0b1220; padding: 0.1rem 0.35rem; border-radius: 4px;
+}
+pre {
+  background: #0b1220; padding: 0.75rem; border-radius: 6px;
+  overflow-x: auto;
+}
+.manual-actions ul { padding-inline-start: 1.2rem; }
+.manual-actions li { margin-bottom: 0.75rem; }
+.manual-actions details { margin-top: 1rem; }
+.manual-actions summary { cursor: pointer; color: var(--accent); }
