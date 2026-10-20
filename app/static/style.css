@@ -1,3 +1,4 @@
+/* ============ المتغيرات (نفس لوحتك الداكنة + إضافات) ============ */
 :root {
   --bg: #0f172a;
   --card: #1e293b;
@@ -8,36 +9,111 @@
   --bad: #f87171;
   --warn: #fbbf24;
   --border: #334155;
+
+  --sidebar-bg: #0b1220;
+  --sidebar-hover: #1e293b;
+  --sidebar-active: #38bdf8;
+  --sidebar-text: #cbd5e1;
+  --radius: 10px;
+  --sidebar-w: 260px;
 }
+
 * { box-sizing: border-box; }
-body {
+
+html, body {
   margin: 0;
   font-family: system-ui, -apple-system, "Segoe UI", Tahoma, sans-serif;
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
+}
+
+/* ============ القائمة الجانبية ============ */
+.sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: var(--sidebar-w);
+  height: 100vh;
+  background: var(--sidebar-bg);
+  border-inline-start: 1px solid var(--border);
   display: flex;
   flex-direction: column;
+  padding: 1.25rem 1rem;
+  z-index: 1000;
+  overflow-y: auto;
+  transition: transform 0.25s ease;
 }
-.topbar {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 0.75rem 1.25rem;
-  background: #0b1220;
-  border-bottom: 1px solid var(--border);
-}
-.brand { font-weight: 700; }
-nav a {
-  color: var(--accent);
-  margin-inline-start: 1rem;
-  text-decoration: none;
-}
-nav a:hover { text-decoration: underline; }
-main {
-  flex: 1; padding: 1.5rem; max-width: 1100px;
-  margin: 0 auto; width: 100%;
-}
-footer { text-align: center; padding: 1rem; color: var(--muted); }
 
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.25rem 0.25rem 1rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 1rem;
+}
+.brand-icon { font-size: 1.75rem; }
+.brand-text { display: flex; flex-direction: column; line-height: 1.2; }
+.brand-text strong { color: #fff; font-size: 1rem; }
+.brand-text small { color: var(--muted); font-size: 0.75rem; }
+
+.sidebar-nav { display: flex; flex-direction: column; gap: 0.25rem; flex: 1; }
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.7rem 0.85rem;
+  color: var(--sidebar-text);
+  text-decoration: none;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  transition: background 0.15s, color 0.15s, transform 0.15s;
+}
+.nav-item:hover {
+  background: var(--sidebar-hover);
+  color: #fff;
+  transform: translateX(-2px);
+}
+.nav-item.active {
+  background: var(--accent);
+  color: #0b1220;
+  font-weight: 600;
+}
+.nav-icon { font-size: 1.1rem; width: 1.4rem; text-align: center; }
+
+.sidebar-footer {
+  border-top: 1px solid var(--border);
+  padding-top: 1rem;
+  color: var(--muted);
+  font-size: 0.75rem;
+  text-align: center;
+}
+
+/* ============ المحتوى ============ */
+.content {
+  margin-inline-end: var(--sidebar-w);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem 2rem;
+}
+.content-header h1 {
+  margin: 0 0 1.25rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+.content-body { flex: 1; }
+.content-footer {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  text-align: center;
+}
+
+/* ============ بطاقات وشبكة (من تصميمك) ============ */
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -46,11 +122,15 @@ footer { text-align: center; padding: 1rem; color: var(--muted); }
 .card {
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: var(--radius);
   padding: 1rem;
   margin-bottom: 1rem;
 }
-.card h2 { margin-top: 0; font-size: 1rem; color: var(--accent); }
+.card h2, .card h3 {
+  margin-top: 0;
+  font-size: 1rem;
+  color: var(--accent);
+}
 .kv td { padding: 0.35rem 0.5rem; border-bottom: 1px dashed var(--border); }
 .kv td:first-child { color: var(--muted); width: 40%; }
 
@@ -61,8 +141,12 @@ button {
   background: #1d4ed8;
   color: #fff; border: none; padding: 0.55rem 1rem;
   border-radius: 8px; cursor: pointer; font: inherit;
+  transition: background 0.15s, transform 0.1s;
 }
 button:hover { background: #2563eb; }
+button:active { transform: scale(0.97); }
+button.bad { background: #b91c1c; }
+button.bad:hover { background: #dc2626; }
 
 table.data {
   width: 100%; border-collapse: collapse; margin-top: 0.5rem;
@@ -77,9 +161,8 @@ table.data th { color: var(--muted); font-weight: 600; }
 .bad { color: var(--bad); }
 .warn { color: var(--warn); }
 .muted { color: var(--muted); }
-.ip-big {
-  font-size: 1.6rem; font-weight: 700; letter-spacing: 0.03em;
-}
+.ip-big { font-size: 1.6rem; font-weight: 700; letter-spacing: 0.03em; }
+
 code {
   background: #0b1220; padding: 0.1rem 0.35rem; border-radius: 4px;
 }
@@ -87,7 +170,52 @@ pre {
   background: #0b1220; padding: 0.75rem; border-radius: 6px;
   overflow-x: auto;
 }
-.manual-actions ul { padding-inline-start: 1.2rem; }
-.manual-actions li { margin-bottom: 0.75rem; }
-.manual-actions details { margin-top: 1rem; }
-.manual-actions summary { cursor: pointer; color: var(--accent); }
+
+/* ============ زر فتح القائمة (جوال) ============ */
+.sidebar-toggle {
+  display: none;
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 1100;
+  width: 44px; height: 44px;
+  align-items: center; justify-content: center;
+  background: var(--sidebar-bg);
+  border: 1px solid var(--border);
+  color: #fff;
+  font-size: 1.4rem;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.sidebar-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 900;
+}
+.sidebar-backdrop.show { display: block; }
+
+/* ============ استجابة الجوال ============ */
+@media (max-width: 900px) {
+  .sidebar { transform: translateX(100%); }
+  .sidebar.open { transform: translateX(0); }
+  .sidebar-toggle { display: flex; }
+
+  .content {
+    margin-inline-end: 0;
+    padding: 4rem 1rem 1.5rem;
+  }
+  .content-header h1 { font-size: 1.25rem; }
+  table.data th, table.data td { padding: 0.45rem 0.5rem; font-size: 0.85rem; }
+}
+
+/* ============ حركة دخول المحتوى ============ */
+.content-body > * {
+  animation: fadeIn 0.25s ease both;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
