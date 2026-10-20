@@ -8,6 +8,7 @@ class StatusResponse(BaseModel):
     public_ip: str | None
     reserved_ip: str | None
     wireguard_active: bool
+    digitalocean_enabled: bool = True
     checked_at: datetime
 
 
