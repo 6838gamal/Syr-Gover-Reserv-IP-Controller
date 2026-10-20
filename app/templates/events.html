@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}الأحداث{% endblock %}
+{% block content %}
+<h1>آخر الأحداث</h1>
+<div id="events-list"
+     hx-get="/partials/events?limit=100"
+     hx-trigger="load, every 30s" hx-swap="innerHTML">
+  <div class="muted">تحميل…</div>
+</div>
+{% endblock %}
