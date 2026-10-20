@@ -20,6 +20,8 @@ def create_snapshot(
     try:
         mgr = SnapshotManager(do, settings.droplet, settings.snapshot, store)
         return mgr.run(body.name)
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -41,5 +43,7 @@ def delete_snapshot(image_id: int, do: DOClient = Depends(get_do)):
     try:
         do.delete_snapshot(image_id)
         return {"ok": True, "deleted": image_id}
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
