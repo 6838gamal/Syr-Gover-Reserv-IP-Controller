@@ -1,0 +1,39 @@
+<div class="card manual-actions">
+  <h2>⚠️ إجراءات يدوية (لا ينفذها التطبيق)</h2>
+  <p class="muted">
+    هذه العمليات تُنفذ من لوحة DigitalOcean لتجنب تعطيل السيرفر.
+  </p>
+
+  <ul>
+    <li>
+      <strong>استعادة من snapshot</strong><br>
+      <a href="https://cloud.digitalocean.com/droplets" target="_blank">
+        فتح لوحة DO →</a>
+      <small>Snapshots → اختر نسخة → Restore</small>
+    </li>
+    <li>
+      <strong>Rebuild كامل</strong><br>
+      <a href="https://cloud.digitalocean.com/droplets" target="_blank">
+        لوحة DO → Droplet → Rebuild</a>
+      <small>تأكد من ربط Reserved IP بعد الإتمام</small>
+    </li>
+    <li>
+      <strong>فك ربط Reserved IP</strong><br>
+      <a href="https://cloud.digitalocean.com/networking/reserved_ips"
+         target="_blank">لوحة DO → Reserved IPs</a>
+    </li>
+  </ul>
+
+  <details>
+    <summary>Checklist استعادة آمنة</summary>
+    <ol>
+      <li>خذ snapshot احتياطي جديد من اللوحة</li>
+      <li>Unassign Reserved IP من Droplet الحالي</li>
+      <li>Rebuild أو Restore من snapshot</li>
+      <li>Assign Reserved IP للـ Droplet</li>
+      <li>SSH: تحقق من <code>ip addr show eth0</code></li>
+      <li>SSH: <code>systemctl status wg-quick@wg0 do-wg-api</code></li>
+      <li>اختبر: <code>curl ifconfig.me</code> = Reserved IP</li>
+    </ol>
+  </details>
+</div>
