@@ -1,0 +1,17 @@
+<h2>فحص الصحة العميق</h2>
+{% if h.ok %}
+  <p class="ok">✅ كل الفحوصات ناجحة</p>
+{% else %}
+  <p class="bad">🚨 مشاكل:</p>
+  <ul>
+    {% for issue in h.issues %}<li class="bad">{{ issue }}</li>{% endfor %}
+  </ul>
+{% endif %}
+<table class="kv">
+  {% for k, v in h.checks.items() %}
+  <tr>
+    <td>{{ k }}</td>
+    <td>{% if v %}<span class="ok">✅</span>{% else %}<span class="bad">❌</span>{% endif %}</td>
+  </tr>
+  {% endfor %}
+</table>
