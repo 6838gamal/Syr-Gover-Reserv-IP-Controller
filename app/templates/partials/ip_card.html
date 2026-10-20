@@ -1,0 +1,12 @@
+<h2>عنوان IP الحالي</h2>
+{% if result.ok %}
+  <p class="ip-big">{{ result.ip }}</p>
+  {% if result.changed %}
+    <p class="warn">⚠️ تغيّر من {{ result.previous_ip }}</p>
+  {% else %}
+    <p class="ok">لم يتغيّر</p>
+  {% endif %}
+{% else %}
+  <p class="bad">فشل: {{ result.error }}</p>
+{% endif %}
+<p class="muted">{{ result.checked_at.strftime("%Y-%m-%d %H:%M:%S") }}</p>
