@@ -1,0 +1,13 @@
+<h2>حالة النظام</h2>
+<table class="kv">
+  <tr><td>Droplet</td><td>{{ s.droplet_id }} — {{ s.droplet_status }}</td></tr>
+  <tr><td>IP العام</td><td>{{ s.public_ip or "—" }}</td></tr>
+  <tr><td>Reserved IP</td>
+      <td>{% if s.reserved_ip %}{{ s.reserved_ip }}
+          {% else %}<span class="bad">لا يوجد</span>{% endif %}</td></tr>
+  <tr><td>WireGuard</td>
+      <td>{% if s.wireguard_active %}<span class="ok">يعمل</span>
+          {% else %}<span class="bad">متوقف</span>{% endif %}</td></tr>
+  <tr><td>آخر فحص</td>
+      <td>{{ s.checked_at.strftime("%Y-%m-%d %H:%M:%S") }}</td></tr>
+</table>
