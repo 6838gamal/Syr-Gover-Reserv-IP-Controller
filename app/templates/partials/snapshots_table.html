@@ -1,0 +1,24 @@
+<h2>القائمة ({{ snaps|length }})</h2>
+{% if snaps %}
+<table class="data">
+  <thead>
+    <tr><th>ID</th><th>الاسم</th><th>التاريخ</th><th></th></tr>
+  </thead>
+  <tbody>
+    {% for s in snaps %}
+    <tr>
+      <td>{{ s.id }}</td>
+      <td>{{ s.name }}</td>
+      <td>{{ s.created_at }}</td>
+      <td>
+        <button hx-delete="/ui/snapshots/{{ s.id }}"
+                hx-target="#snapshots-list" hx-swap="innerHTML"
+                hx-confirm="حذف {{ s.name }}؟">🗑️</button>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="muted">لا يوجد snapshots بعد.</p>
+{% endif %}
