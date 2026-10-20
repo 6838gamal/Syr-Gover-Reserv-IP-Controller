@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}التنبيهات{% endblock %}
+{% block content %}
+<h1>التنبيهات</h1>
+
+<div class="card">
+  <h2>حالة القنوات</h2>
+  <p>القنوات المفعّلة: <strong>{{ channels }}</strong></p>
+  {% if channels == 0 %}
+    <p class="warn">⚠️ لا قنوات مفعّلة — لن تصلك تنبيهات.
+    حرّر <code>config.yaml</code> وفعّل Telegram أو بريداً.</p>
+  {% endif %}
+  <button hx-post="/ui/alerts/test" hx-target="#test-result"
+          hx-swap="innerHTML">📨 إرسال اختبار</button>
+  <div id="test-result"></div>
+</div>
+
+<div class="card">
+  <h2>كيفية التفعيل</h2>
+  <p>عدّل <code>config.yaml</code>، ثم:</p>
+  <pre><code>sudo systemctl restart do-wg-api</code></pre>
+
+  <h3>Telegram</h3>
+  <ol>
+    <li>راسل <code>@BotFather</code> → <code>/newbot</code> → احصل على token</li>
+    <li>أرسل رسالة للبوت → <code>getUpdates</code> → chat_id</li>
+    <li>ضع token + chat_id في <code>config.yaml</code></li>
+  </ol>
+
+  <h3>بريد</h3>
+  <p>SMTP + App Password (Gmail).</p>
+
+  <h3>Webhook (Slack/Discord)</h3>
+  <p>ضع URL الـ webhook.</p>
+</div>
+{% endblock %}
