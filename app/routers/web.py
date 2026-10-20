@@ -7,7 +7,7 @@ from fastapi.templating import Jinja2Templates
 
 from ..alerts import AlertManager
 from ..config import Settings, get_settings
-from ..deps import get_alerts, get_do, get_store, get_wg
+from ..deps import get_alerts, get_do_optional, get_store, get_wg
 from ..do_client import DOClient
 from ..monitor import IPMonitor
 from ..snapshot import SnapshotManager
@@ -23,17 +23,17 @@ router = APIRouter()
 # ---------- Pages ----------
 @router.get("/", response_class=HTMLResponse)
 def dashboard(request: Request):
-    return templates.TemplateResponse("dashboard.html", {"request": request})
+    return templates.TemplateResponse(request, "dashboard.html", {})
 
 
 @router.get("/snapshots-page", response_class=HTMLResponse)
 def snapshots_page(request: Request):
-    return templates.TemplateResponse("snapshots.html", {"request": request})
+    return templates.TemplateResponse(request, "snapshots.html", {})
 
 
 @router.get("/events-page", response_class=HTMLResponse)
 def events_page(request: Request):
-    return templates.TemplateResponse("events.html", {"request": request})
+    return templates.TemplateResponse(request, "events.html", {})
 
 
 @router.get("/alerts-page", response_class=HTMLResponse)
@@ -43,9 +43,9 @@ def alerts_page(
     alerts: AlertManager = Depends(get_alerts),
 ):
     return templates.TemplateResponse(
+        request,
         "alerts.html",
-        {"request": request, "settings": settings,
-         "channels": len(alerts.channels)},
+        {"settings": settings, "channels": len(alerts.channels)},
     )
 
 
@@ -60,6 +60,19 @@ def _status_data(settings: Settings, do: DOClient, wg: WireGuard) -> dict:
         "public_ip": do.get_public_ip(settings.droplet.id),
         "reserved_ip": reserved[0]["ip"] if reserved else None,
         "wireguard_active": wg.is_active(),
+        "digitalocean_enabled": True,
+        "checked_at": datetime.now(timezone.utc),
+    }
+
+
+def _status_data_disabled(settings: Settings, wg: WireGuard) -> dict:
+    return {
+        "droplet_id": settings.droplet.id,
+        "droplet_status": "unknown",
+        "public_ip": None,
+        "reserved_ip": None,
+        "wireguard_active": wg.is_active(),
+        "digitalocean_enabled": False,
         "checked_at": datetime.now(timezone.utc),
     }
 
@@ -88,7 +101,7 @@ def _deep_health(settings: Settings, do: DOClient, wg: WireGuard) -> dict:
             public_ip = None
         checks["public_ip_matches"] = public_ip == reserved[0]["ip"]
         if not checks["public_ip_matches"]:
-            issues.append(f"IP العام ≠ Reserved")
+            issues.append("IP العام ≠ Reserved")
 
     try:
         snaps = do.list_snapshots(
@@ -103,17 +116,32 @@ def _deep_health(settings: Settings, do: DOClient, wg: WireGuard) -> dict:
     return {"ok": not issues, "checks": checks, "issues": issues}
 
 
+def _deep_health_disabled(wg: WireGuard) -> dict:
+    checks = {
+        "digitalocean_enabled": False,
+        "wireguard_active": wg.is_active(),
+    }
+    issues = ["DigitalOcean غير مفعّل (DO_TOKEN غير مضبوط)"]
+    if not checks["wireguard_active"]:
+        issues.append("WireGuard متوقف")
+    return {"ok": False, "checks": checks, "issues": issues}
+
+
 # ---------- HTMX partials ----------
 @router.get("/partials/status", response_class=HTMLResponse)
 def partial_status(
     request: Request,
     settings: Settings = Depends(get_settings),
-    do: DOClient = Depends(get_do),
+    do: DOClient | None = Depends(get_do_optional),
     wg: WireGuard = Depends(get_wg),
 ):
+    data = (
+        _status_data(settings, do, wg)
+        if do is not None
+        else _status_data_disabled(settings, wg)
+    )
     return templates.TemplateResponse(
-        "partials/status_card.html",
-        {"request": request, "s": _status_data(settings, do, wg)},
+        request, "partials/status_card.html", {"s": data}
     )
 
 
@@ -121,12 +149,16 @@ def partial_status(
 def partial_health(
     request: Request,
     settings: Settings = Depends(get_settings),
-    do: DOClient = Depends(get_do),
+    do: DOClient | None = Depends(get_do_optional),
     wg: WireGuard = Depends(get_wg),
 ):
+    data = (
+        _deep_health(settings, do, wg)
+        if do is not None
+        else _deep_health_disabled(wg)
+    )
     return templates.TemplateResponse(
-        "partials/health_card.html",
-        {"request": request, "h": _deep_health(settings, do, wg)},
+        request, "partials/health_card.html", {"h": data}
     )
 
 
@@ -138,7 +170,7 @@ def partial_ip(
 ):
     result = IPMonitor(settings.monitor, store).check()
     return templates.TemplateResponse(
-        "partials/ip_card.html", {"request": request, "result": result}
+        request, "partials/ip_card.html", {"result": result}
     )
 
 
@@ -150,7 +182,7 @@ def ui_check_ip(
 ):
     result = IPMonitor(settings.monitor, store).check()
     return templates.TemplateResponse(
-        "partials/ip_card.html", {"request": request, "result": result}
+        request, "partials/ip_card.html", {"result": result}
     )
 
 
@@ -158,25 +190,34 @@ def ui_check_ip(
 def ui_restart_wg(
     request: Request,
     settings: Settings = Depends(get_settings),
-    do: DOClient = Depends(get_do),
+    do: DOClient | None = Depends(get_do_optional),
     wg: WireGuard = Depends(get_wg),
 ):
     try:
         wg.restart()
     except Exception:
         pass
+    data = (
+        _status_data(settings, do, wg)
+        if do is not None
+        else _status_data_disabled(settings, wg)
+    )
     return templates.TemplateResponse(
-        "partials/status_card.html",
-        {"request": request, "s": _status_data(settings, do, wg)},
+        request, "partials/status_card.html", {"s": data}
     )
 
 
 @router.post("/ui/snapshots", response_class=HTMLResponse)
 def ui_create_snapshot(
     settings: Settings = Depends(get_settings),
-    do: DOClient = Depends(get_do),
+    do: DOClient | None = Depends(get_do_optional),
     store: EventStore = Depends(get_store),
 ):
+    if do is None:
+        return HTMLResponse(
+            '<p class="bad">❌ ميزة DigitalOcean غير مفعّلة '
+            '(DO_TOKEN غير مضبوط)</p>'
+        )
     mgr = SnapshotManager(do, settings.droplet, settings.snapshot, store)
     try:
         res = mgr.run()
@@ -192,12 +233,19 @@ def ui_create_snapshot(
 def partial_snapshots(
     request: Request,
     settings: Settings = Depends(get_settings),
-    do: DOClient = Depends(get_do),
+    do: DOClient | None = Depends(get_do_optional),
 ):
+    if do is None:
+        return templates.TemplateResponse(
+            request,
+            "partials/snapshots_table.html",
+            {"snaps": [], "do_disabled": True},
+        )
     prefix = f"{settings.snapshot.name_prefix}-{settings.droplet.id}"
     return templates.TemplateResponse(
+        request,
         "partials/snapshots_table.html",
-        {"request": request, "snaps": do.list_snapshots(prefix=prefix)},
+        {"snaps": do.list_snapshots(prefix=prefix), "do_disabled": False},
     )
 
 
@@ -206,16 +254,23 @@ def ui_delete_snapshot(
     image_id: int,
     request: Request,
     settings: Settings = Depends(get_settings),
-    do: DOClient = Depends(get_do),
+    do: DOClient | None = Depends(get_do_optional),
 ):
+    if do is None:
+        return templates.TemplateResponse(
+            request,
+            "partials/snapshots_table.html",
+            {"snaps": [], "do_disabled": True},
+        )
     try:
         do.delete_snapshot(image_id)
     except Exception:
         pass
     prefix = f"{settings.snapshot.name_prefix}-{settings.droplet.id}"
     return templates.TemplateResponse(
+        request,
         "partials/snapshots_table.html",
-        {"request": request, "snaps": do.list_snapshots(prefix=prefix)},
+        {"snaps": do.list_snapshots(prefix=prefix), "do_disabled": False},
     )
 
 
@@ -226,8 +281,8 @@ def partial_events(
     store: EventStore = Depends(get_store),
 ):
     return templates.TemplateResponse(
-        "partials/events_table.html",
-        {"request": request, "events": store.list_recent(limit)},
+        request, "partials/events_table.html",
+        {"events": store.list_recent(limit)},
     )
 
 
