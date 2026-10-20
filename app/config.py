@@ -1,3 +1,4 @@
+import logging
 import os
 from dataclasses import dataclass, field
 from functools import lru_cache
@@ -7,6 +8,8 @@ import yaml
 from dotenv import load_dotenv
 
 load_dotenv()
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -93,6 +96,10 @@ class Settings:
     do_token: str
     log_level: str
 
+    @property
+    def do_enabled(self) -> bool:
+        return bool(self.do_token)
+
 
 def _mk_droplet(d: dict[str, Any]) -> DropletCfg:
     return DropletCfg(**d)
@@ -137,11 +144,9 @@ def get_settings(path: str = "config.yaml") -> Settings:
     with open(path, "r", encoding="utf-8") as f:
         raw = yaml.safe_load(f)
 
-    do_token = os.getenv("DO_TOKEN")
-    if not do_token:
-        raise RuntimeError("DO_TOKEN مفقود في .env")
+    do_token = os.getenv("DO_TOKEN", "").strip()
 
-    return Settings(
+    settings = Settings(
         droplet=_mk_droplet(raw["droplet"]),
         wireguard=_mk_wireguard(raw["wireguard"]),
         monitor=_mk_monitor(raw["monitor"]),
@@ -152,3 +157,12 @@ def get_settings(path: str = "config.yaml") -> Settings:
         do_token=do_token,
         log_level=os.getenv("LOG_LEVEL", "INFO"),
     )
+
+    if not settings.do_token:
+        logger.warning(
+            "DO_TOKEN غير مضبوط — ميزات DigitalOcean "
+            "(Droplets / Snapshots / Reserved IPs) معطّلة. "
+            "اضبطه كمتغير بيئة في منصة النشر أو في ملف .env محلياً."
+        )
+
+    return settings
