@@ -1,0 +1,17 @@
+<table class="data">
+  <thead>
+    <tr><th>#</th><th>الوقت</th><th>النوع</th><th>الرسالة</th></tr>
+  </thead>
+  <tbody>
+    {% for e in events %}
+    <tr>
+      <td>{{ e.id }}</td>
+      <td>{{ e.ts }}</td>
+      <td><code>{{ e.kind }}</code></td>
+      <td>{{ e.message }}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="4" class="muted">لا توجد أحداث</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
