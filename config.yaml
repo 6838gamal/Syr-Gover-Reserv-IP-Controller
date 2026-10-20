@@ -1,0 +1,45 @@
+droplet:
+  id: 123456789
+  region: fra1
+  interface: eth0
+  reserved_ip_cidr: 20
+
+wireguard:
+  interface: wg0
+  listen_port: 51820
+  config_path: /etc/wireguard/wg0.conf
+
+monitor:
+  state_file: /var/lib/do-wg/last-ip.txt
+  check_url: https://api.ipify.org
+
+snapshot:
+  keep: 7
+  name_prefix: auto
+  wait_timeout_seconds: 900
+
+storage:
+  db_path: /var/lib/do-wg/events.db
+
+alerts:
+  telegram:
+    enabled: false
+    bot_token: ""
+    chat_id: ""
+  email:
+    enabled: false
+    smtp_host: ""
+    smtp_port: 587
+    smtp_user: ""
+    smtp_password: ""
+    from: ""
+    to: ""
+  webhook:
+    enabled: false
+    url: ""
+  cooldown_seconds: 1800
+
+watchdog:
+  heartbeat_file: /var/lib/do-wg/heartbeat.txt
+  stale_after_seconds: 600
+  check_interval_seconds: 60
