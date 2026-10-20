@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <title>{% block title %}لوحة التحكم{% endblock %} — DO + WG</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="/static/htmx.min.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">🛡️ DO + WireGuard</div>
+    <nav>
+      <a href="/">الرئيسية</a>
+      <a href="/snapshots-page">Snapshots</a>
+      <a href="/events-page">الأحداث</a>
+      <a href="/alerts-page">التنبيهات</a>
+    </nav>
+  </header>
+  <main>{% block content %}{% endblock %}</main>
+  <footer>
+    <small>واجهة إدارية — للاستخدام الداخلي فقط</small>
+  </footer>
+</body>
+</html>
